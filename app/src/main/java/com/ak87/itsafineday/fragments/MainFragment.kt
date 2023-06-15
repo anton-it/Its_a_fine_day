@@ -1,16 +1,23 @@
 package com.ak87.itsafineday.fragments
 
+import android.Manifest
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import com.ak87.itsafineday.R
 import com.ak87.itsafineday.databinding.FragmentMainBinding
+import com.ak87.itsafineday.isPermissionGranted
 
 
 class MainFragment : Fragment() {
 
+    private lateinit var permissionLauncher: ActivityResultLauncher<String>
     private lateinit var binding: FragmentMainBinding
 
     override fun onCreateView(
@@ -20,6 +27,27 @@ class MainFragment : Fragment() {
         binding = FragmentMainBinding.inflate(inflater, container, false)
         return binding.root
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        checkPermission()
+    }
+
+    private fun permissionListener() {
+        permissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()) {
+            Toast.makeText(activity, "Permission is $it", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun checkPermission() {
+        if (!isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            permissionListener()
+            permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
+
+
 
     companion object {
 
