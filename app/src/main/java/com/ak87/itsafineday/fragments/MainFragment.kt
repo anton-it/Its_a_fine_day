@@ -10,12 +10,27 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.FragmentActivity
 import com.ak87.itsafineday.R
+import com.ak87.itsafineday.adapters.VpAdapter
 import com.ak87.itsafineday.databinding.FragmentMainBinding
 import com.ak87.itsafineday.isPermissionGranted
+import com.google.android.material.tabs.TabLayoutMediator
 
 
 class MainFragment : Fragment() {
+
+    private val fragmentList = listOf<Fragment>(
+        HoursFragment.newInstance(),
+        DaysFragment.newInstance()
+    )
+
+    private val tabNameList by lazy {
+        listOf(
+        getString(R.string.Hours),
+        getString(R.string.Days)
+    )
+    }
 
     private lateinit var permissionLauncher: ActivityResultLauncher<String>
     private lateinit var binding: FragmentMainBinding
@@ -31,6 +46,15 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         checkPermission()
+        init()
+    }
+
+    private fun init() = with(binding) {
+        val adapter = VpAdapter(activity as FragmentActivity, fragmentList)
+        vp.adapter = adapter
+        TabLayoutMediator(tabLayout, vp) {
+            tab, pos -> tab.text = tabNameList[pos]
+        }.attach()
     }
 
     private fun permissionListener() {

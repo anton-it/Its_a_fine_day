@@ -2,4 +2,6 @@
     <string name="app_name">Its a fine day</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="Hours">Hours</string>
+    <string name="Days">Days</string>
 </resources>
