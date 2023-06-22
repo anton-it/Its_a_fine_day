@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
 import com.ak87.itsafineday.R
 import com.ak87.itsafineday.adapters.VpAdapter
+import com.ak87.itsafineday.databinding.FragmentHoursBinding
 import com.ak87.itsafineday.databinding.FragmentMainBinding
 import com.ak87.itsafineday.isPermissionGranted
 import com.google.android.material.tabs.TabLayoutMediator
