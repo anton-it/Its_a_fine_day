@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
 import com.ak87.itsafineday.R
 import com.ak87.itsafineday.adapters.VpAdapter
+import com.ak87.itsafineday.adapters.WeatherModel
 import com.ak87.itsafineday.databinding.FragmentHoursBinding
 import com.ak87.itsafineday.databinding.FragmentMainBinding
 import com.ak87.itsafineday.isPermissionGranted
@@ -21,6 +22,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.material.tabs.TabLayoutMediator
+import org.json.JSONObject
 
 
 class MainFragment : Fragment() {
@@ -32,9 +34,9 @@ class MainFragment : Fragment() {
 
     private val tabNameList by lazy {
         listOf(
-        getString(R.string.Hours),
-        getString(R.string.Days)
-    )
+            getString(R.string.Hours),
+            getString(R.string.Days)
+        )
     }
 
     private lateinit var permissionLauncher: ActivityResultLauncher<String>
@@ -58,14 +60,15 @@ class MainFragment : Fragment() {
     private fun init() = with(binding) {
         val adapter = VpAdapter(activity as FragmentActivity, fragmentList)
         vp.adapter = adapter
-        TabLayoutMediator(tabLayout, vp) {
-            tab, pos -> tab.text = tabNameList[pos]
+        TabLayoutMediator(tabLayout, vp) { tab, pos ->
+            tab.text = tabNameList[pos]
         }.attach()
     }
 
     private fun permissionListener() {
         permissionLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestPermission()) {
+            ActivityResultContracts.RequestPermission()
+        ) {
             Toast.makeText(activity, "Permission is $it", Toast.LENGTH_SHORT).show()
         }
     }
@@ -90,16 +93,43 @@ class MainFragment : Fragment() {
         val request = StringRequest(
             Request.Method.GET,
             url,
-            {
-                result -> Log.d("MyLog", "Result: $result")
+            { result ->
+                parseWeatherData(result)
             },
-            {
-                error -> Log.d("MyLog", "Error: $error")
+            { error ->
+                Log.d("MyLog", "Error: $error")
             }
         )
         queue.add(request)
     }
 
+    private fun parseWeatherData(result: String) {
+        try {
+            val mainObject = JSONObject(result)
+            val item = WeatherModel(
+                mainObject.getJSONObject("location").getString("name"),
+                mainObject.getJSONObject("current").getString("last_updated"),
+                mainObject.getJSONObject("current")
+                    .getJSONObject("condition").getString("text"),
+                mainObject.getJSONObject("current").getString("temp_c"),
+                "",
+                "",
+                mainObject.getJSONObject("current")
+                    .getJSONObject("condition").getString("icon"),
+                ""
+            )
+            Log.d("MyLog", "City: ${item.city}")
+            Log.d("MyLog", "Last update: ${item.time}")
+            Log.d("MyLog", "Condition: ${item.condition}")
+            Log.d("MyLog", "Current temp: ${item.currentTemp}")
+            Log.d("MyLog", "Image: ${item.imageUrl}")
+
+        } catch (e: Exception) {
+            throw throw IllegalArgumentException(
+                "Error json arguments"
+            )
+        }
+    }
 
 
     companion object {
