@@ -2,6 +2,7 @@ package com.ak87.itsafineday.fragments
 
 import android.Manifest
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +17,9 @@ import com.ak87.itsafineday.adapters.VpAdapter
 import com.ak87.itsafineday.databinding.FragmentHoursBinding
 import com.ak87.itsafineday.databinding.FragmentMainBinding
 import com.ak87.itsafineday.isPermissionGranted
+import com.android.volley.Request
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.google.android.material.tabs.TabLayoutMediator
 
 
@@ -48,6 +52,7 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         checkPermission()
         init()
+        requestWeatherData("London")
     }
 
     private fun init() = with(binding) {
@@ -72,9 +77,34 @@ class MainFragment : Fragment() {
         }
     }
 
+    private fun requestWeatherData(city: String) {
+        val url = "http://api.weatherapi.com/v1/forecast.json?key=" +
+                API_KEY +
+                "&q=" +
+                city +
+                "&days=" +
+                "3" +
+                "&aqi=no&alerts=no"
+
+        val queue = Volley.newRequestQueue(context)
+        val request = StringRequest(
+            Request.Method.GET,
+            url,
+            {
+                result -> Log.d("MyLog", "Result: $result")
+            },
+            {
+                error -> Log.d("MyLog", "Error: $error")
+            }
+        )
+        queue.add(request)
+    }
+
 
 
     companion object {
+
+        const val API_KEY = "c5c542ee18d54e5981872158231506"
 
         @JvmStatic
         fun newInstance() = MainFragment()
