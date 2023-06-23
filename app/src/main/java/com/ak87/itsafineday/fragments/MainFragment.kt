@@ -104,31 +104,67 @@ class MainFragment : Fragment() {
     }
 
     private fun parseWeatherData(result: String) {
+
+        val mainObject = JSONObject(result)
+        val list = parseDays(mainObject)
+        parseCurrentData(mainObject, list[0])
+    }
+
+    private fun parseCurrentData(mainObject: JSONObject, weatherItem: WeatherModel) {
         try {
-            val mainObject = JSONObject(result)
             val item = WeatherModel(
                 mainObject.getJSONObject("location").getString("name"),
                 mainObject.getJSONObject("current").getString("last_updated"),
                 mainObject.getJSONObject("current")
                     .getJSONObject("condition").getString("text"),
                 mainObject.getJSONObject("current").getString("temp_c"),
-                "",
-                "",
+                weatherItem.maxTemp,
+                weatherItem.minTemp,
                 mainObject.getJSONObject("current")
                     .getJSONObject("condition").getString("icon"),
-                ""
+                weatherItem.dataHours
             )
             Log.d("MyLog", "City: ${item.city}")
             Log.d("MyLog", "Last update: ${item.time}")
             Log.d("MyLog", "Condition: ${item.condition}")
             Log.d("MyLog", "Current temp: ${item.currentTemp}")
             Log.d("MyLog", "Image: ${item.imageUrl}")
+            Log.d("MyLog", "===================================")
+            Log.d("MyLog", "Max: ${item.maxTemp}")
+            Log.d("MyLog", "Min: ${item.minTemp}")
+            Log.d("MyLog", "Condition: ${item.dataHours}")
+
 
         } catch (e: Exception) {
             throw throw IllegalArgumentException(
                 "Error json arguments"
             )
         }
+
+    }
+
+    private fun parseDays(mainObject: JSONObject): List<WeatherModel> {
+        val list = ArrayList<WeatherModel>()
+        val daysArray = mainObject.getJSONObject("forecast")
+            .getJSONArray("forecastday")
+        for (i in 0 until daysArray.length()) {
+            val day = daysArray[i] as JSONObject
+            val name = mainObject.getJSONObject("location").getString("name")
+            val item = WeatherModel(
+                name,
+                day.getString("date"),
+                day.getJSONObject("day").getJSONObject("condition")
+                    .getString("text"),
+            "",
+                day.getJSONObject("day").getString("maxtemp_c"),
+                day.getJSONObject("day").getString("mintemp_c"),
+                day.getJSONObject("day").getJSONObject("condition")
+                    .getString("icon"),
+                day.getJSONArray("hour").toString()
+            )
+            list.add(item)
+        }
+        return list
     }
 
 
@@ -140,3 +176,5 @@ class MainFragment : Fragment() {
         fun newInstance() = MainFragment()
     }
 }
+
+
