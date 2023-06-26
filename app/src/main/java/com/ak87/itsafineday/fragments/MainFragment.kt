@@ -12,6 +12,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModelProvider
+import com.ak87.itsafineday.MainViewModel
 import com.ak87.itsafineday.R
 import com.ak87.itsafineday.adapters.VpAdapter
 import com.ak87.itsafineday.adapters.WeatherModel
@@ -22,6 +24,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.material.tabs.TabLayoutMediator
+import com.squareup.picasso.Picasso
 import org.json.JSONObject
 
 
@@ -41,6 +44,7 @@ class MainFragment : Fragment() {
 
     private lateinit var permissionLauncher: ActivityResultLauncher<String>
     private lateinit var binding: FragmentMainBinding
+    private lateinit var model: MainViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,8 +56,11 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        model = ViewModelProvider(this)[MainViewModel::class.java]
         checkPermission()
         init()
+
+        updateCurrentCard()
         requestWeatherData("London")
     }
 
@@ -63,6 +70,18 @@ class MainFragment : Fragment() {
         TabLayoutMediator(tabLayout, vp) { tab, pos ->
             tab.text = tabNameList[pos]
         }.attach()
+    }
+
+    private fun updateCurrentCard() = with(binding) {
+        model.liveDataCurrent.observe(viewLifecycleOwner) {
+            val maxMinTemp = "${it.maxTemp}C°/${it.maxTemp}C°"
+            tvData.text = it.time
+            tvCity.text = it.city
+            tvCurrentTemp.text = it.currentTemp
+            tvCondition.text = it.condition
+            tvMaxMin.text = maxMinTemp
+            Picasso.get().load(HTTPS_URL + it.imageUrl).into(imWeather)
+        }
     }
 
     private fun permissionListener() {
@@ -124,6 +143,7 @@ class MainFragment : Fragment() {
                     .getJSONObject("condition").getString("icon"),
                 weatherItem.dataHours
             )
+            model.liveDataCurrent.value = item
             Log.d("MyLog", "City: ${item.city}")
             Log.d("MyLog", "Last update: ${item.time}")
             Log.d("MyLog", "Condition: ${item.condition}")
@@ -171,6 +191,7 @@ class MainFragment : Fragment() {
     companion object {
 
         const val API_KEY = "c5c542ee18d54e5981872158231506"
+        const val HTTPS_URL = "https:"
 
         @JvmStatic
         fun newInstance() = MainFragment()
