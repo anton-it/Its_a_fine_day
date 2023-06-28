@@ -12,6 +12,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.ak87.itsafineday.MainViewModel
 import com.ak87.itsafineday.R
@@ -44,7 +45,8 @@ class MainFragment : Fragment() {
 
     private lateinit var permissionLauncher: ActivityResultLauncher<String>
     private lateinit var binding: FragmentMainBinding
-    private lateinit var model: MainViewModel
+//    private lateinit var model: MainViewModel
+    private val model: MainViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,10 +58,9 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        model = ViewModelProvider(this)[MainViewModel::class.java]
+//        model = ViewModelProvider(this)[MainViewModel::class.java]
         checkPermission()
         init()
-
         updateCurrentCard()
         requestWeatherData("London")
     }
