@@ -76,7 +76,7 @@ class HoursFragment : Fragment() {
     private fun initRecyclerView() = with(binding){
 //        val list = mutableListOf<WeatherModel>()
         rcView.layoutManager = LinearLayoutManager(activity)
-        adapter = WeatherAdapter()
+        adapter = WeatherAdapter(null)
         rcView.adapter = adapter
 //        for (i in 0 until 20) {
 //            val item = WeatherModel(

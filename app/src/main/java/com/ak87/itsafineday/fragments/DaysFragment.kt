@@ -11,9 +11,10 @@ import androidx.recyclerview.widget.ListAdapter
 import com.ak87.itsafineday.MainViewModel
 import com.ak87.itsafineday.R
 import com.ak87.itsafineday.adapters.WeatherAdapter
+import com.ak87.itsafineday.adapters.WeatherModel
 import com.ak87.itsafineday.databinding.FragmentDaysBinding
 
-class DaysFragment : Fragment() {
+class DaysFragment : Fragment(), WeatherAdapter.Listener {
     private lateinit var adapter: WeatherAdapter
     private lateinit var binding: FragmentDaysBinding
     private val model: MainViewModel by activityViewModels()
@@ -27,7 +28,7 @@ class DaysFragment : Fragment() {
     }
 
     private fun init() = with(binding) {
-        adapter = WeatherAdapter()
+        adapter = WeatherAdapter(this@DaysFragment)
         rcView.layoutManager = LinearLayoutManager(activity)
         rcView.adapter = adapter
     }
@@ -47,5 +48,9 @@ class DaysFragment : Fragment() {
     companion object {
 
         fun newInstance() = DaysFragment()
+    }
+
+    override fun onClick(item: WeatherModel) {
+        model.liveDataCurrent.value = item
     }
 }
