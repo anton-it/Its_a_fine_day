@@ -5,16 +5,43 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ListAdapter
+import com.ak87.itsafineday.MainViewModel
 import com.ak87.itsafineday.R
+import com.ak87.itsafineday.adapters.WeatherAdapter
+import com.ak87.itsafineday.databinding.FragmentDaysBinding
 
 class DaysFragment : Fragment() {
+    private lateinit var adapter: WeatherAdapter
+    private lateinit var binding: FragmentDaysBinding
+    private val model: MainViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_days, container, false)
+        binding = FragmentDaysBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    private fun init() = with(binding) {
+        adapter = WeatherAdapter()
+        rcView.layoutManager = LinearLayoutManager(activity)
+        rcView.adapter = adapter
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        init()
+        updateRecyclerViewDays()
+    }
+
+    private fun updateRecyclerViewDays() {
+        model.liveDataList.observe(viewLifecycleOwner) {
+            adapter.submitList(it.subList(1, it.size))
+        }
     }
 
     companion object {
