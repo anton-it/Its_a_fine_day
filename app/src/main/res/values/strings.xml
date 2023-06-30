@@ -6,4 +6,8 @@
     <string name="Days">Days</string>
     <string name="empty_text">Empty</string>
     <string name="location_disabled">Location disabled!</string>
+    <string name="enable_location">Enable location?</string>
+    <string name="wont_enabled_location">Location disabled, do you wont enabled location?</string>
+    <string name="button_text_ok">OK</string>
+    <string name="button_text_cancel">Cancel</string>
 </resources>
